@@ -1,0 +1,35 @@
+Jay Hayward
+CYBR 5830-013
+Project 2
+
+WRITEUP
+
+To approach this project I took inspiration from the data carver lab and the way I recovered those images.
+I started by defining the magic numbers that mark the start and end points of the file, to use when I start carving.
+I encoded these in byte strings because it's easy to match to the raw binary file given.
+The start of my program essentially reads the file in index 1 of the command line and prints all that binary data to an object.
+I defined 3 "find_carve__" functions, each with a different data type.
+These functions serve the purpose of finding all files with that type, printing info to the command line, moving the files to my folder "hayward" and appending the md5 hashes to my "hashest.txt"
+If the folder or file don't already exist, the program will create them.
+To find the files, I started by defining an sof value of a file as the index of where the first header marker is found.
+For example, for finding jpgs I defined my first sof value the index in the data that matched "FF D8"
+I found the first instance of the trailer marker, eg "FF D9" and defined that as the eof.
+I ran this in a loop, making sure to always start the next sof find after the previous eof find, as to not find the same file over and over again.
+I produced a file by carving the data from the range sof to eof.
+Whenever I carved out a file, I simply gave it a name of <number>.<type> like 1.jpg, 2.jpg, etc.
+Whenever I had a file I took the md5 hash using hexdigest and wrote that to my hashes file.
+I end the function printing out the file type, sof and eof offsets, and the size, measured by eof-sof
+
+
+TO RUN MY SCRIPT:
+
+python carver.py <filename>
+
+
+The carved files will be written to a folder called "hayward." The files will be in there along with a document "hashes.txt" which contains the md5 hashes of the carved files.
+Note that when testing multiple files, it is advised to run "rm -rf hayward/" after each consecutive test so that you can start with a freshly initialized folder to keep track of the current test
+
+I found the easiest way to collect all the data is to just run the carver for each type individually.
+The find_carves_jpg function will produce a lot of junk data, but that's mainly due to the fact that FF D8 and FF D9 aren't uncommon hex values to appear in raw data.
+For the png and pdf finds, there was much less room for error.
+I figured the method I used is still optimal because it produces false positives, but will never look over a false negative.

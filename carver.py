@@ -43,7 +43,7 @@ def find_carves_jpg(data):  # carves = files I'm extracting
                 hash_object.write(str(name_c) + ".jpg" + ": " + md5(carve).hexdigest() + "\n")
 
             name_c += 1
-            clen = eof - sof
+            clen = eof - sof  # length of the carved file
             s_offset = hex(sof)  # take the hex value of the decimal sof offset
             e_offset = hex(eof)  # take the hex value of the decimal eof offset
             print("found a {} file at offsets {} and {} with size of {} bytes".format(ctype,s_offset,e_offset,clen))
