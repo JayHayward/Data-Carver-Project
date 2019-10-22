@@ -22,6 +22,8 @@ def main():
     os.mkdir("hayward")  # make directory to put finished carved data
 
     find_carves_jpg(data)
+    find_carves_png(data)
+    find_carves_pdf(data)
 
 
 def find_carves_jpg(data):  # carves = files I'm extracting
@@ -48,6 +50,53 @@ def find_carves_jpg(data):  # carves = files I'm extracting
             eof = data.find(jpg_mark[1], eof + 1)  # update to next eof
         sof = data.find(jpg_mark[0], sof + 1)  # update to next sof
 
+
+def find_carves_png(data):  # carves = files I'm extracting
+    ctype = 'PNG'  # type of carved file
+    clen = 0  # length of carved file
+    name_c = 1  # name given to new carved file
+    sof = data.find(png_mark[0])
+    while sof != -1:
+        eof = data.find(png_mark[1], sof + 1)  # must find the eof at a position AFTER the sof
+        while eof != -1:  # check the current sof with every eof
+            carve = data[sof:eof]  # range of bytes in which the file is found
+            with open("./hayward/" + str(name_c) + ".png", 'wb') as name_object:  #write files to folder
+                name_object.write(carve)
+
+            with open("./hayward/hashes.txt", 'a+') as hash_object:  # write hashes to file
+                hash_object.write(str(name_c) + ".png" + ": " + md5(carve).hexdigest() + "\n")
+
+            name_c += 1
+            clen = eof - sof
+            s_offset = hex(sof)  # take the hex value of the decimal sof offset
+            e_offset = hex(eof)  # take the hex value of the decimal eof offset
+            print("found a {} file at offsets {} and {} with size of {} bytes".format(ctype,s_offset,e_offset,clen))
+            eof = data.find(png_mark[1], eof + 1)  # update to next eof
+        sof = data.find(png_mark[0], sof + 1)  # update to next sof
+
+
+def find_carves_pdf(data):  # carves = files I'm extracting
+    ctype = 'PDF'  # type of carved file
+    clen = 0  # length of carved file
+    name_c = 1  # name given to new carved file
+    sof = data.find(pdf_mark[0])
+    while sof != -1:
+        eof = data.find(pdf_mark[1], sof + 1)  # must find the eof at a position AFTER the sof
+        while eof != -1:  # check the current sof with every eof
+            carve = data[sof:eof]  # range of bytes in which the file is found
+            with open("./hayward/" + str(name_c) + ".pdf", 'wb') as name_object:  #write files to folder
+                name_object.write(carve)
+
+            with open("./hayward/hashes.txt", 'a+') as hash_object:  # write hashes to file
+                hash_object.write(str(name_c) + ".pdf" + ": " + md5(carve).hexdigest() + "\n")
+
+            name_c += 1
+            clen = eof - sof
+            s_offset = hex(sof)  # take the hex value of the decimal sof offset
+            e_offset = hex(eof)  # take the hex value of the decimal eof offset
+            print("found a {} file at offsets {} and {} with size of {} bytes".format(ctype,s_offset,e_offset,clen))
+            eof = data.find(pdf_mark[1], eof + 1)  # update to next eof
+        sof = data.find(pdf_mark[0], sof + 1)  # update to next sof
 
 
 if __name__ == "__main__":
