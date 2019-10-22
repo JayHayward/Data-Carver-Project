@@ -26,6 +26,8 @@ def main():
 
 def find_carves_jpg(data):  # carves = files I'm extracting
     # will likely find a lot of false positives due to frequency of magic number pattern
+    ctype = 'JPG'  # type of carved file
+    clen = 0  # length of carved file
     name_c = 1  # name given to new carved file
     sof = data.find(jpg_mark[0])  #start of file
     while sof != -1:
@@ -33,11 +35,19 @@ def find_carves_jpg(data):  # carves = files I'm extracting
         while eof != -1:  # check the current sof with every eof
             carve = data[sof:eof]  # range of bytes in which the file is found
             with open("./hayward/" + str(name_c) + ".jpg", 'wb') as name_object:  #write files to folder
-                print('found file')
                 name_object.write(carve)
 
+            with open("./hayward/hashes.txt", 'a+') as hash_object:  # write hashes to file
+                hash_object.write(str(name_c) + ".jpg" + ": " + md5(carve).hexdigest() + "\n")
+
+            name_c += 1
+            clen = eof - sof
+            s_offset = hex(sof)  # take the hex value of the decimal sof offset
+            e_offset = hex(eof)  # take the hex value of the decimal eof offset
+            print("found a {} file at offsets {} and {} with size of {} bytes".format(ctype,s_offset,e_offset,clen))
             eof = data.find(jpg_mark[1], eof + 1)  # update to next eof
         sof = data.find(jpg_mark[0], sof + 1)  # update to next sof
+
 
 
 if __name__ == "__main__":
